@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather API</title>
+    <link
+      rel="shortcut icon"
+      href="https://imgs.search.brave.com/aTqKGpfWT81-_FJtAI_-vhqdoxmaY-hc9dSvEgHoiyE/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzEyLzM2LzA1LzA3/LzM2MF9GXzEyMzYw/NTA3NzNfWk5CZnBN/UFhTUmVteElSZjVS/ejFwOHU2Z1V5NTJY/NjcuanBn"
+      type="image/x-icon"
+    />
+    <style>
+      body {
+        background-color: rgb(79, 76, 117);
+        color: white;
+      }
+      #input {
+        height: 100px;
+        width: 500px;
+        border: 2px solid black;
+        padding: 20px;
+        margin: 20px;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
+          rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+          rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+        border-radius: 20px;
+        background-color: rgb(59, 74, 157);
+      }
+      #tbody{
+        display: flex;
+        flex-wrap: wrap;
+        height: 500px;
+        width: 100%;
+      }
+      #weatherdata {
+        height: 350px;
+        width: 500px;
+        border: 2px solid black;
+        padding: 20px;
+        align-items: center;
+        align-content: center;
+        justify-content: center;
+        margin: 20px;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
+          rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+          rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+        border-radius: 20px;
+        background-color: rgb(59, 74, 157);
+      }
+      #gmap {
+        position: relative;
+        text-align: right;
+        height: 400px;
+        width: 400px;
+      }
+      #gmap_canva {
+        margin: 20px;
+        overflow: hidden;
+        /* background: none !important; */
+        margin-left: 170px;
+        height: 390px;
+        width: 500px;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
+          rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+          rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+        border-radius: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <center>
+      <div id="input">
+        <h1>Weather API</h1>
+        <input
+          type="text"
+          placeholder="Enter your city name"
+          id="input1"
+          style="background-color: black; color: white; border: black"
+        />
+        <button
+          onclick="fetchcity()"
+          style="background-color: black; color: white; border: black"
+        >
+          Search
+        </button>
+      </div>
+    </center>
+    <div id="tbody"></div>
+  </body>
+</html>
+<script>
+  let press = document.querySelector("#input");
+  document.addEventListener('keydown',(e)=>{
+    if(e.key=='Enter' || e.key=='S'){
+       fetchcity();
+    } 
+  });
+  async function fetchcity() {
+    let cityname = document.getElementById("input1").value;
+    let api1 = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${cityname}&appid=6febe02229c35165011877934abd1eec`
+    );
+    if (!cityname) alert("Type name of any city");
+    let data1 = await api1.json();
+    if (data1.cod !== 200) {
+      alert("City not found. Please try again.");
+      return;
+    }
+    // console.log(data);
+    displayWeather(data1);
+    updateMap(cityname);
+  }
+  
+  function displayWeather(obj) {
+    document.querySelector("#tbody").innerText = "";
+
+    // console.log(obj);
+    let div1 = document.createElement("div");
+    div1.setAttribute("id", "weatherdata");
+    let head = document.createElement("h1");
+    head.innerText = `Weather data in  ${obj.name}`;
+    let p = document.createElement("h2");
+    let currentTime = new Date().toLocaleTimeString();
+    // console.log(currentTime);
+    // console.log(currentTime.charAt(currentTime.length-2));
+    if(currentTime.charAt(currentTime.length-2)=='P'){
+      if(currentTime.charAt(0)>=12 && currentTime.charAt(0)<=5)p.innerText = `${currentTime} Good After Noon`;
+      else p.innerText = `${currentTime} Good Evening`;
+    }else {
+      if(currentTime.charAt(0)>=12 && currentTime.charAt(0)<=5)p.innerText = `${currentTime} Good Night`;
+      else p.innerText = `${currentTime} Good Morning`;
+    }
+    let p1 = document.createElement("p");
+    p1.innerText = `Max_temp : 🔥 ${obj.main.temp_max}F`;
+    let p2 = document.createElement("p");
+    p2.innerText = `Min_temp : 🌡 ${obj.main.temp_min}F`;
+    let p3 = document.createElement("p");
+    p3.innerText = `Weather : ${obj.weather[0].description}`;
+    let p4 = document.createElement("p");
+    p4.innerText = `Wind speed : 💨 ${obj.wind.speed}Km/hr`;
+    let p5 = document.createElement("p");
+    p5.innerText = `Sunrise : ⛅ ${obj.sys.sunrise}  and Sunset :🌆 ${obj.sys.sunset}`;
+    div1.append(head,p, p1, p2, p3, p4, p5);
+    document.querySelector("#tbody").append(div1);
+  }
+
+  function updateMap(name) {
+    let map = document.createElement("div");
+    map.setAttribute("id", "gmap");
+    map.style.div = "block";
+    let iframe = document.createElement("iframe");
+    iframe.setAttribute("id", "gmap_canva");
+    iframe.src = `https://maps.google.com/maps?q=${name}%20&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+    map.append(iframe);
+    document.querySelector("#tbody").append(map);
+  }
+</script>
